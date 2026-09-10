@@ -29,6 +29,9 @@ version="${mod_version}" #mandatory
 # A display name for the mod
 displayName="${mod_name}" #mandatory
 
+# Restrict this mod to the client distribution only.
+side="CLIENT"
+
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
@@ -41,12 +44,11 @@ displayName="${mod_name}" #mandatory
 # A text field displayed in the mod UI
 #credits="" #optional
 
-# The authors of the mod, displayed in the mod UI (optional)
-#authors=""
+authors="${mod_authors}"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Example mod description.
+${mod_description}
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
@@ -69,7 +71,7 @@ Example mod description.
     # Optional field describing why the dependency is required or why it is incompatible
     # reason="..."
     # The version range of the dependency
-    versionRange="[${neo_version},)" #mandatory
+    versionRange="${neo_version_range}" #mandatory
     # An ordering relationship for the dependency.
     # BEFORE - This mod is loaded BEFORE the dependency
     # AFTER - This mod is loaded AFTER the dependency
