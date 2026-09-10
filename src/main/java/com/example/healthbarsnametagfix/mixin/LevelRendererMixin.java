@@ -1,8 +1,6 @@
 package com.example.healthbarsnametagfix.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fuzs.healthbars.HealthBars;
-import fuzs.healthbars.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -67,10 +65,27 @@ public abstract class LevelRendererMixin {
         poseStack.popPose();
     }
 
-    // mirrors HealthBars' own draw decision so we only step in when it renders nothing for this entity
+    // mirrors HealthBars' own draw decision so we only step in when it renders nothing for this entity;
+    // uses reflection so this mod doesn't need HealthBars as a compile-time dependency
     private static boolean healthbarsnametagfix$isHealthBarsNotHandling(LivingEntity entity) {
-        ClientConfig config = HealthBars.CONFIG.get(ClientConfig.class);
-        boolean healthBarsActive = config.anyRendering.get() && config.levelRendering;
-        return !healthBarsActive || !config.isEntityAllowed(entity);
+        try {
+            Class<?> healthBarsClass = Class.forName("fuzs.healthbars.HealthBars");
+            Object configHolder = healthBarsClass.getField("CONFIG").get(null);
+            Class<?> clientConfigClass = Class.forName("fuzs.healthbars.config.ClientConfig");
+            Object config = configHolder.getClass()
+                    .getMethod("get", Class.class)
+                    .invoke(configHolder, clientConfigClass);
+
+            Object anyRendering = clientConfigClass.getField("anyRendering").get(config);
+            boolean anyRenderingActive = (Boolean) anyRendering.getClass().getMethod("get").invoke(anyRendering);
+            boolean levelRenderingActive = clientConfigClass.getField("levelRendering").getBoolean(config);
+            boolean isEntityAllowed = (Boolean) clientConfigClass
+                    .getMethod("isEntityAllowed", LivingEntity.class)
+                    .invoke(config, entity);
+
+            return !(anyRenderingActive && levelRenderingActive) || !isEntityAllowed;
+        } catch (ReflectiveOperationException | ClassCastException exception) {
+            return true;
+        }
     }
 }
