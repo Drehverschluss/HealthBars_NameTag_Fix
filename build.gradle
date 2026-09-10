@@ -120,8 +120,6 @@ dependencies {
     localRuntime files("libs/HealthBars-v21.1.0-1.21.1-NeoForge.jar")
     compileOnly files("libs/PuzzlesLib-v21.1.60-mc1.21.1-NeoForge.jar")
     localRuntime files("libs/PuzzlesLib-v21.1.60-mc1.21.1-NeoForge.jar")
-    compileOnly files("libs/minecolonies-1.1.1345-1.21.1-snapshot.jar")
-    localRuntime files("libs/minecolonies-1.1.1345-1.21.1-snapshot.jar")
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

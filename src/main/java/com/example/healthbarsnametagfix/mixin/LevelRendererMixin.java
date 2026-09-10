@@ -8,8 +8,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// renders MineColonies' persistent name tag the same way EntityCulling renders occluded name tags:
+// renders any entity's persistent name tag the same way EntityCulling renders occluded name tags:
 // directly at the entity-iteration level, bypassing HealthBars' render() hook entirely
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
@@ -35,7 +33,7 @@ public abstract class LevelRendererMixin {
             CallbackInfo callback
     ) {
         if (!(entity instanceof LivingEntity livingEntity)
-                || !healthbarsnametagfix$isMineColoniesCitizenOrVisitor(entity)
+                || !livingEntity.isCustomNameVisible()
                 || !healthbarsnametagfix$isHealthBarsNotHandling(livingEntity)) {
             return;
         }
@@ -67,12 +65,6 @@ public abstract class LevelRendererMixin {
                 partialTick
         );
         poseStack.popPose();
-    }
-
-    private static boolean healthbarsnametagfix$isMineColoniesCitizenOrVisitor(Entity entity) {
-        ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
-        return "minecolonies".equals(entityId.getNamespace())
-                && ("citizen".equals(entityId.getPath()) || "visitor".equals(entityId.getPath()));
     }
 
     // mirrors HealthBars' own draw decision so we only step in when it renders nothing for this entity
